@@ -67,6 +67,34 @@
   <div id="content">
     <div id="toc-panel">
       <div id="toc-list"></div>
+
+      <div id="sidebar-splitter" title="Drag to resize Files"></div>
+
+      <div id="file-panel">
+        <div id="file-panel-header" title="Expand/collapse Files">
+          <span id="file-panel-caret" aria-hidden="true">&#9656;</span>
+          <span id="file-panel-title">Files</span>
+          <span id="file-root-label">No folder</span>
+
+          <button id="file-refresh" title="Refresh folder tree" aria-label="Refresh folder tree">
+            <svg viewBox="0 0 16 16" fill="none">
+              <path d="M13 5V2.5M13 2.5h-2.5M13 2.5A5.5 5.5 0 1 0 13.2 10"
+                    stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <button id="file-open-folder" title="Open folder" aria-label="Open folder">
+            <svg viewBox="0 0 16 16" fill="none">
+              <path d="M2 13V4.5a1 1 0 0 1 1-1h3L7.5 5H13a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"
+                    stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+          </button>
+        </div>
+
+        <div id="file-tree">
+          <div class="file-tree-empty">Open a folder</div>
+        </div>
+      </div>
     </div>
     <div id="editor-container" class="active">
       <div id="recent-panel"></div>

@@ -10,10 +10,13 @@ use tao::{
     window::WindowBuilder,
 };
 use windows::Win32::Foundation::{HWND, RECT};
-use windows::Win32::UI::WindowsAndMessaging::{SetWindowPos, SWP_ASYNCWINDOWPOS, SWP_NOACTIVATE, SWP_NOZORDER};
+use windows::Win32::UI::WindowsAndMessaging::{
+    SetWindowPos, SWP_ASYNCWINDOWPOS, SWP_NOACTIVATE, SWP_NOZORDER,
+};
 use wry::{WebViewBuilder, WebViewBuilderExtWindows, WebViewExtWindows};
 
 mod file_ops;
+mod folder_tree;
 mod ipc;
 mod state;
 mod window_state;
@@ -24,6 +27,7 @@ const APP_JS: &str = include_str!("frontend/app.js");
 const EDITOR_JS: &str = include_str!("frontend/editor.js");
 const PREVIEW_JS: &str = include_str!("frontend/preview.js");
 const TABS_JS: &str = include_str!("frontend/tabs.js");
+const FOLDER_TREE_JS: &str = include_str!("frontend/folder_tree.js");
 const MARKED_JS: &str = include_str!("frontend/marked.min.js");
 const HLJS: &str = include_str!("frontend/highlight.min.js");
 
@@ -221,11 +225,23 @@ fn main() {
                 let h = new_size.height as i32;
                 unsafe {
                     let controller = _webview.controller();
-                    let _ = controller.SetBounds(RECT { left: 0, top: 0, right: w, bottom: h });
+                    let _ = controller.SetBounds(RECT {
+                        left: 0,
+                        top: 0,
+                        right: w,
+                        bottom: h,
+                    });
                     let mut host = HWND::default();
                     if controller.ParentWindow(&mut host).is_ok() {
-                        let _ = SetWindowPos(host, None, 0, 0, w, h,
-                            SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOZORDER);
+                        let _ = SetWindowPos(
+                            host,
+                            None,
+                            0,
+                            0,
+                            w,
+                            h,
+                            SWP_ASYNCWINDOWPOS | SWP_NOACTIVATE | SWP_NOZORDER,
+                        );
                     }
                 }
             }
@@ -254,13 +270,14 @@ fn escape_for_script_tag(js: &str) -> String {
 fn build_html() -> String {
     // Build script tags with escaped content
     let scripts = format!(
-        "<script>{}</script>\n<script>{}</script>\n<script>{}</script>\n<script>{}</script>\n<script>{}</script>\n<script>{}</script>",
+        "<script>{}</script>\n<script>{}</script>\n<script>{}</script>\n<script>{}</script>\n<script>{}</script>\n<script>{}</script>\n<script>{}</script>",
         escape_for_script_tag(HLJS),
         escape_for_script_tag(MARKED_JS),
         escape_for_script_tag(PREVIEW_JS),
         escape_for_script_tag(TABS_JS),
         escape_for_script_tag(EDITOR_JS),
         escape_for_script_tag(APP_JS),
+        escape_for_script_tag(FOLDER_TREE_JS),
     );
 
     INDEX_HTML

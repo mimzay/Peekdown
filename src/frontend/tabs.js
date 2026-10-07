@@ -139,6 +139,9 @@ var TabManager = (function() {
     }
 
     document.getElementById('status-file').textContent = tab.filename;
+    if (typeof window.onActiveTabChanged === 'function') {
+      window.onActiveTabChanged(tab.path);
+    }
     if (typeof updateWordCount === 'function') updateWordCount();
     if (typeof showRecentPanel === 'function') showRecentPanel();
     if (typeof tocOpen !== 'undefined' && tocOpen && typeof updateTOC === 'function') updateTOC();

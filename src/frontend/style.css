@@ -647,6 +647,206 @@ body.preview-resizing #preview { user-select: none; }
 }
 
 /* ============================================
+   FILE TREE â€” bottom half of the outline sidebar
+   ============================================ */
+#toc-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+#toc-panel.open {
+  overflow: hidden;
+}
+
+#toc-list {
+  flex: 1 1 auto;
+  min-height: 72px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#sidebar-splitter {
+  display: none;
+  flex: 0 0 4px;
+  height: 4px;
+  cursor: row-resize;
+  background: transparent;
+  border-top: 1px solid var(--border-subtle);
+  transition: background 0.1s;
+}
+
+#toc-panel.files-expanded #sidebar-splitter {
+  display: block;
+}
+
+#sidebar-splitter:hover,
+#sidebar-splitter.dragging {
+  background: var(--accent-glow);
+  border-top-color: var(--accent);
+}
+
+#file-panel {
+  width: 220px;
+  flex: 0 0 28px;
+  min-height: 28px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+}
+
+#file-panel.expanded {
+  min-height: 110px;
+  max-height: calc(100% - 82px);
+}
+
+#file-panel-header {
+  flex: 0 0 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 5px 0 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+#file-panel-header:hover {
+  background: rgba(128, 128, 128, 0.06);
+  color: var(--text);
+}
+
+#file-panel-caret {
+  width: 10px;
+  flex: 0 0 10px;
+  color: var(--text-dim);
+  font-size: 10px;
+  line-height: 1;
+}
+
+#file-panel-title {
+  flex: 0 0 auto;
+  font-weight: 600;
+}
+
+#file-root-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dim);
+  font-size: 9.5px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+#file-panel-header button {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+#file-panel-header button:hover {
+  background: rgba(128, 128, 128, 0.1);
+  color: var(--text);
+}
+
+#file-panel-header button svg {
+  width: 13px;
+  height: 13px;
+}
+
+#file-tree {
+  display: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 3px 0 6px;
+}
+
+#file-panel.expanded #file-tree {
+  display: block;
+}
+
+.file-tree-empty,
+.file-tree-note {
+  padding: 8px 10px;
+  color: var(--text-dim);
+  font-size: 10.5px;
+  font-style: italic;
+}
+
+.file-tree-note {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 4px;
+}
+
+.tree-row {
+  height: 23px;
+  display: flex;
+  align-items: center;
+  min-width: max-content;
+  padding-right: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 23px;
+  white-space: nowrap;
+}
+
+.tree-row:hover {
+  background: rgba(128, 128, 128, 0.08);
+  color: var(--text);
+}
+
+.tree-row.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.tree-chevron,
+.tree-spacer {
+  width: 12px;
+  flex: 0 0 12px;
+  color: var(--text-dim);
+  font-size: 9px;
+  text-align: center;
+}
+
+.tree-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree-dir > .tree-name {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.tree-children.collapsed {
+  display: none;
+}
+
+body.sidebar-resizing {
+  cursor: row-resize !important;
+  user-select: none !important;
+}
+
+/* ============================================
    RECENT FILES
    ============================================ */
 #recent-panel {

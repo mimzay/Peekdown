@@ -4,6 +4,7 @@ use tao::window::Window;
 use wry::WebView;
 
 use crate::file_ops;
+use crate::folder_tree;
 use crate::state::AppState;
 
 #[derive(Deserialize)]
@@ -37,14 +38,50 @@ pub fn handle_ipc_message(
             if let Some(p) = path {
                 match file_ops::read_file(&p) {
                     Ok(contents) => {
-                        send_to_js(webview, "file_opened", &serde_json::json!({
-                            "content": contents,
-                            "path": p
-                        }));
+                        send_to_js(
+                            webview,
+                            "file_opened",
+                            &serde_json::json!({
+                                "content": contents,
+                                "path": p
+                            }),
+                        );
                     }
-                    Err(e) => send_to_js(webview, "error", &serde_json::json!({
-                        "message": format!("Failed to open file: {e}")
-                    })),
+                    Err(e) => send_to_js(
+                        webview,
+                        "error",
+                        &serde_json::json!({
+                            "message": format!("Failed to open file: {e}")
+                        }),
+                    ),
+                }
+            }
+        }
+        "open_folder" => {
+            let folder = parsed
+                .path
+                .map(std::path::PathBuf::from)
+                .or_else(folder_tree::pick_folder);
+
+            if let Some(path) = folder {
+                match folder_tree::build_tree(&path) {
+                    Ok(tree) => match serde_json::to_value(tree) {
+                        Ok(value) => send_to_js(webview, "folder_opened", &value),
+                        Err(e) => send_to_js(
+                            webview,
+                            "error",
+                            &serde_json::json!({
+                                "message": format!("Failed to serialize folder tree: {e}")
+                            }),
+                        ),
+                    },
+                    Err(e) => send_to_js(
+                        webview,
+                        "error",
+                        &serde_json::json!({
+                            "message": format!("Failed to open folder: {e}")
+                        }),
+                    ),
                 }
             }
         }
@@ -53,13 +90,21 @@ pub fn handle_ipc_message(
                 if let Some(ref path) = parsed.path {
                     match file_ops::write_file(path, content) {
                         Ok(_) => {
-                            send_to_js(webview, "file_saved", &serde_json::json!({
-                                "path": path
-                            }));
+                            send_to_js(
+                                webview,
+                                "file_saved",
+                                &serde_json::json!({
+                                    "path": path
+                                }),
+                            );
                         }
-                        Err(e) => send_to_js(webview, "error", &serde_json::json!({
-                            "message": format!("Failed to save: {e}")
-                        })),
+                        Err(e) => send_to_js(
+                            webview,
+                            "error",
+                            &serde_json::json!({
+                                "message": format!("Failed to save: {e}")
+                            }),
+                        ),
                     }
                 } else {
                     handle_save_as(webview, parsed.content);
@@ -104,56 +149,79 @@ pub fn handle_ipc_message(
         }
         "drag_enter" => {
             let _ = webview.evaluate_script(
-                "document.getElementById('drop-overlay').classList.add('visible')");
+                "document.getElementById('drop-overlay').classList.add('visible')",
+            );
         }
         "drag_leave" => {
             let _ = webview.evaluate_script(
-                "document.getElementById('drop-overlay').classList.remove('visible')");
+                "document.getElementById('drop-overlay').classList.remove('visible')",
+            );
         }
         "ready" => {
             let (pending_file, pending_content, pending_title) = {
                 let mut st = state.lock().unwrap();
-                (st.pending_file.take(), st.pending_content.take(), st.pending_title.take())
+                (
+                    st.pending_file.take(),
+                    st.pending_content.take(),
+                    st.pending_title.take(),
+                )
             };
             if let Some(p) = pending_file {
                 match file_ops::read_file(&p) {
                     Ok(contents) => {
-                        send_to_js(webview, "file_opened", &serde_json::json!({
-                            "content": contents,
-                            "path": p
-                        }));
+                        send_to_js(
+                            webview,
+                            "file_opened",
+                            &serde_json::json!({
+                                "content": contents,
+                                "path": p
+                            }),
+                        );
                     }
-                    Err(e) => send_to_js(webview, "error", &serde_json::json!({
-                        "message": format!("Failed to open file: {e}")
-                    })),
+                    Err(e) => send_to_js(
+                        webview,
+                        "error",
+                        &serde_json::json!({
+                            "message": format!("Failed to open file: {e}")
+                        }),
+                    ),
                 }
             } else if let Some(content) = pending_content {
                 let title = pending_title.unwrap_or_else(|| "stdin".to_string());
-                send_to_js(webview, "stdin_opened", &serde_json::json!({
-                    "content": content,
-                    "title": title
-                }));
+                send_to_js(
+                    webview,
+                    "stdin_opened",
+                    &serde_json::json!({
+                        "content": content,
+                        "title": title
+                    }),
+                );
             }
         }
         _ => eprintln!("Unknown IPC command: {}", parsed.command),
     }
 }
 
-fn handle_save_as(
-    webview: &WebView,
-    content: Option<String>,
-) {
+fn handle_save_as(webview: &WebView, content: Option<String>) {
     if let Some(content) = content {
         if let Some(path) = file_ops::pick_save_file() {
             match file_ops::write_file(&path, &content) {
                 Ok(_) => {
-                    send_to_js(webview, "file_saved", &serde_json::json!({
-                        "path": path
-                    }));
+                    send_to_js(
+                        webview,
+                        "file_saved",
+                        &serde_json::json!({
+                            "path": path
+                        }),
+                    );
                 }
-                Err(e) => send_to_js(webview, "error", &serde_json::json!({
-                    "message": format!("Failed to save: {e}")
-                })),
+                Err(e) => send_to_js(
+                    webview,
+                    "error",
+                    &serde_json::json!({
+                        "message": format!("Failed to save: {e}")
+                    }),
+                ),
             }
         }
     }
