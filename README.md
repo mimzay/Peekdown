@@ -7,6 +7,8 @@ Built with Rust + WebView2. No installer, no runtime dependencies, no Electron.
 ![Preview mode](screenshot%201.jpg)
 ![Split view](screenshot%202.jpg)
 
+*--v0.1.0--mattsstack--10-01-2026--*
+![Split view](screenshot%203.jpg)
 ## Features
 
 - **Instant startup** — native window, no framework overhead
@@ -17,6 +19,8 @@ Built with Rust + WebView2. No installer, no runtime dependencies, no Electron.
 - **Dark/Light themes** — Catppuccin Mocha and Latte color schemes
 - **Find in document** — Ctrl+F with match highlighting and navigation
 - **Table of Contents** — auto-generated outline sidebar (Ctrl+Shift+O)
+- **Folder Tree** — sliding window below Table of Contents with file-picker and refresh (Ctrl+Shift+O)
+*--v0.1.0--mattsstack--10-01-2026--*
 - **Zoom** — Ctrl+/- or Ctrl+scroll, with level indicator
 - **Drag & drop** — drop `.md` files to open, drop multiple to open tabs
 - **Adjustable preview width** — drag the edge to resize
